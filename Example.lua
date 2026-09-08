@@ -413,6 +413,10 @@ DropdownGroupBox:AddDropdown("MyMultiDropdown", {
 	-- Currently you can not set multiple values with a dropdown
 
 	Values = { "This", "is", "a", "dropdown" },
+	ValueTooltips = {
+		This = "Tooltip for This",
+		is = "Tooltip for is",
+	},
 	Default = 1,
 	Multi = true, -- true / false, allows multiple choices to be selected
 
@@ -430,6 +434,11 @@ DropdownGroupBox:AddDropdown("MyMultiDropdown", {
 Options.MyMultiDropdown:SetValue({
 	This = true,
 	is = true,
+})
+
+Options.MyMultiDropdown:SetValueTooltips({
+	This = "Updated tooltip for This",
+	is = "Updated tooltip for is",
 })
 
 DropdownGroupBox:AddDropdown("MyDisabledDropdown", {

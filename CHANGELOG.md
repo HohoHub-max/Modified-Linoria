@@ -1,3 +1,9 @@
+## 08.09.2026
+```diff
++ Dropdown values support individual hover descriptions through ValueTooltips
++ Added Dropdown:SetValueTooltips(valueTooltips)
+```
+
 ## 21.04.2026
 ```diff
 + SaveManager:SetLoadingOrder(enabled: boolean, order: { })

@@ -2606,6 +2606,8 @@ do
             Values = Info.Values;
             Value = Info.Multi and {};
             DisabledValues = Info.DisabledValues or {};
+            ValueTooltips = Info.ValueTooltips or {};
+            ValueTooltipObjects = {};
 
             Multi = Info.Multi;
             Type = "Dropdown";
@@ -2861,6 +2863,11 @@ do
             local DisabledValues = Dropdown.DisabledValues
             local Buttons = {}
 
+            for _, ValueTooltip in next, Dropdown.ValueTooltipObjects do
+                ValueTooltip:Destroy()
+            end
+            table.clear(Dropdown.ValueTooltipObjects)
+
             for _, Element in next, Scrolling:GetChildren() do
                 if not Element:IsA("UIListLayout") then
                     Element:Destroy()
@@ -2896,6 +2903,11 @@ do
                     BackgroundColor3 = "MainColor";
                     BorderColor3 = "OutlineColor";
                 })
+
+                local ValueTooltipText = Dropdown.ValueTooltips[Value] or Dropdown.ValueTooltips[StringValue]
+                if typeof(ValueTooltipText) == "string" then
+                    table.insert(Dropdown.ValueTooltipObjects, Library:AddToolTip(ValueTooltipText, ValueTooltipText, Button))
+                end
 
                 local ButtonLabel = Library:CreateLabel({
                     Active = false;
@@ -3024,6 +3036,11 @@ do
                 Dropdown.DisabledValues = NewValues
             end
 
+            Dropdown:BuildDropdownList()
+        end
+
+        function Dropdown:SetValueTooltips(NewValueTooltips)
+            Dropdown.ValueTooltips = typeof(NewValueTooltips) == "table" and NewValueTooltips or {}
             Dropdown:BuildDropdownList()
         end
 
@@ -4601,6 +4618,8 @@ do
             Values = Info.Values;
             Value = Info.Multi and {};
             DisabledValues = Info.DisabledValues or {};
+            ValueTooltips = Info.ValueTooltips or {};
+            ValueTooltipObjects = {};
 
             Multi = Info.Multi;
             Type = "Dropdown";
@@ -4866,6 +4885,11 @@ do
             local DisabledValues = Dropdown.DisabledValues
             local Buttons = {}
 
+            for _, ValueTooltip in next, Dropdown.ValueTooltipObjects do
+                ValueTooltip:Destroy()
+            end
+            table.clear(Dropdown.ValueTooltipObjects)
+
             for _, Element in next, Scrolling:GetChildren() do
                 if not Element:IsA("UIListLayout") then
                     Element:Destroy()
@@ -4899,6 +4923,11 @@ do
                     BackgroundColor3 = "MainColor";
                     BorderColor3 = "OutlineColor";
                 })
+
+                local ValueTooltipText = Dropdown.ValueTooltips[Value] or Dropdown.ValueTooltips[StringValue]
+                if typeof(ValueTooltipText) == "string" then
+                    table.insert(Dropdown.ValueTooltipObjects, Library:AddToolTip(ValueTooltipText, ValueTooltipText, Button))
+                end
 
                 local ButtonLabel = Library:CreateLabel({
                     Active = false;
@@ -5021,6 +5050,11 @@ do
                 Dropdown.DisabledValues = NewValues
             end
 
+            Dropdown:BuildDropdownList()
+        end
+
+        function Dropdown:SetValueTooltips(NewValueTooltips)
+            Dropdown.ValueTooltips = typeof(NewValueTooltips) == "table" and NewValueTooltips or {}
             Dropdown:BuildDropdownList()
         end
 

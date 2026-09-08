@@ -823,7 +823,15 @@ function Library:AddToolTip(InfoStr, DisabledInfoStr, HoverInstance)
     UpdateText(InfoStr)
 
     GiveSignal(HoverInstance.MouseEnter:Connect(function()
-        if Library:MouseIsOverOpenedFrame() then
+        local BelongsToOpenedFrame = false
+        for OpenedFrame in next, Library.OpenedFrames do
+            if HoverInstance:IsDescendantOf(OpenedFrame) then
+                BelongsToOpenedFrame = true
+                break
+            end
+        end
+
+        if Library:MouseIsOverOpenedFrame() and not BelongsToOpenedFrame then
             Tooltip.Visible = false
             return
         end

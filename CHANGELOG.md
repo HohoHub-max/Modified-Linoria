@@ -2,6 +2,7 @@
 ```diff
 + Dropdown values support individual hover descriptions through ValueTooltips
 + Added Dropdown:SetValueTooltips(valueTooltips)
++ Value tooltips remain visible inside an opened dropdown list
 ```
 
 ## 21.04.2026

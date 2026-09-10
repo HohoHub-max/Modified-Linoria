@@ -94,13 +94,28 @@ local Dialogues = {}
 local BaseURL = "https://raw.githubusercontent.com/HohoHub-max/Modified-Linoria/refs/heads/main/"
 local CustomImageManager = {}
 local CustomImageManagerAssets = {
-    Cursor = {
+    CursorNormal = {
         RobloxId = 9619665977,
-        Path = "LinoriaLib/assets/PoseidonCursor.png",
-        URL = BaseURL .. "assets/Cursor.png",
+        Path = "LinoriaLib/assets/cursors/anathema-dark-gray/NormalSelect.png",
+        URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Normal%20Select.png",
 
         Id = nil,
     },
+
+    CursorLink = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/LinkSelect.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Link%20Select.png", Id = nil },
+    CursorText = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/TextSelect.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Text%20Select.png", Id = nil },
+    CursorMove = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/Move.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Move.png", Id = nil },
+    CursorResizeHorizontal = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/HorizontalResize.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Horizontal%20Resize.png", Id = nil },
+    CursorResizeVertical = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/VerticalResize.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Vertical%20Resize.png", Id = nil },
+    CursorResizeDiagonal1 = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/DiagonalResize1.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Diagonal%20Resize%201.png", Id = nil },
+    CursorResizeDiagonal2 = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/DiagonalResize2.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Diagonal%20Resize%202.png", Id = nil },
+    CursorUnavailable = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/Unavailable.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Unavailable.png", Id = nil },
+    CursorHelp = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/HelpSelect.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Help%20Select.png", Id = nil },
+    CursorBusy = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/Busy.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Busy.png", Id = nil },
+    CursorWorking = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/WorkingInBackground.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Working%20In%20Background.png", Id = nil },
+    CursorPrecision = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/PrecisionSelect.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Precision%20Select.png", Id = nil },
+    CursorHandwriting = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/Handwriting.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Handwriting.png", Id = nil },
+    CursorAlternate = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/AlternateSelect.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Alternate%20Select.png", Id = nil },
 
     DropdownArrow = {
         RobloxId = 6282522798,
@@ -557,6 +572,7 @@ end
 
 function Library:MakeDraggable(Instance, Cutoff, IsMainWindow)
     Instance.Active = true
+    Instance:SetAttribute("LinoriaCursor", "CursorMove")
 
     if Library.IsMobile == false then
         Instance.InputBegan:Connect(function(Input)
@@ -702,6 +718,7 @@ function Library:MakeResizable(Instance, MinSize)
         ZIndex = 2;
         Parent = Resizer;
     })
+    ResizerImage:SetAttribute("LinoriaCursor", "CursorResizeDiagonal1")
 
     local ResizerImageUICorner = Library:Create("UICorner", {
         CornerRadius = UDim.new(0.5, 0);
@@ -7988,7 +8005,7 @@ end
                 local CursorImage = Library:Create("ImageLabel", {
                     BackgroundTransparency = 1;
                     BorderSizePixel = 0;
-                    Image = CustomImageManager.GetAsset("Cursor");
+                    Image = CustomImageManager.GetAsset("CursorNormal");
                     Position = UDim2.fromOffset(0, 0);
                     Size = UDim2.fromOffset(34, 34);
                     ZIndex = 9999;
@@ -7998,6 +8015,7 @@ end
 
                 local OldMouseIconState = InputService.MouseIconEnabled
                 local ShowCursorBinding = Library.ShowCursorBinding
+                local CurrentCursorAsset = "CursorNormal"
                 pcall(function() RunService:UnbindFromRenderStep(ShowCursorBinding) end)
                 RunService:BindToRenderStep(ShowCursorBinding, Enum.RenderPriority.Camera.Value - 1, function()
                     InputService.MouseIconEnabled = not Library.ShowCustomCursor
@@ -8005,6 +8023,29 @@ end
                     local GuiInset = GuiService:GetGuiInset()
                     CursorImage.Position = UDim2.fromOffset(MousePosition.X - GuiInset.X, MousePosition.Y - GuiInset.Y)
                     CursorImage.Visible = Library.ShowCustomCursor
+
+                    local CursorAsset = "CursorNormal"
+                    local GuiObjects = GuiService:GetGuiObjectsAtPosition(MousePosition.X, MousePosition.Y)
+                    for _, GuiObject in ipairs(GuiObjects) do
+                        if GuiObject ~= CursorImage and GuiObject:IsDescendantOf(ScreenGui) then
+                            local ExplicitCursor = GuiObject:GetAttribute("LinoriaCursor")
+                            if typeof(ExplicitCursor) == "string" and CustomImageManagerAssets[ExplicitCursor] then
+                                CursorAsset = ExplicitCursor
+                                break
+                            elseif GuiObject:IsA("TextBox") then
+                                CursorAsset = "CursorText"
+                                break
+                            elseif GuiObject:IsA("GuiButton") and GuiObject.Active ~= false then
+                                CursorAsset = "CursorLink"
+                                break
+                            end
+                        end
+                    end
+
+                    if CursorAsset ~= CurrentCursorAsset then
+                        CurrentCursorAsset = CursorAsset
+                        CursorImage.Image = CustomImageManager.GetAsset(CursorAsset)
+                    end
 
                     if not Toggled or (not ScreenGui or not ScreenGui.Parent) then
                         InputService.MouseIconEnabled = OldMouseIconState

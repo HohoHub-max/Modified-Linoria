@@ -90,7 +90,7 @@ local Tooltips = {}
 local Dialogues = {}
 
 -- https://github.com/deividcomsono/Obsidian/blob/main/Library.lua#L30
-local BaseURL = "https://raw.githubusercontent.com/mstudio45/LinoriaLib/refs/heads/main/"
+local BaseURL = "https://raw.githubusercontent.com/HohoHub-max/Modified-Linoria/refs/heads/main/"
 local CustomImageManager = {}
 local CustomImageManagerAssets = {
     Cursor = {
@@ -231,22 +231,22 @@ local Library = {
     HudRegistry = {};
 
     -- colors and font --
-    FontColor = Color3.fromRGB(255, 255, 255);
-    MainColor = Color3.fromRGB(28, 28, 28);
-    BackgroundColor = Color3.fromRGB(20, 20, 20);
+    FontColor = Color3.fromRGB(235, 238, 242);
+    MainColor = Color3.fromRGB(22, 25, 29);
+    BackgroundColor = Color3.fromRGB(13, 15, 18);
 
-    AccentColor = Color3.fromRGB(0, 85, 255);
-    DisabledAccentColor = Color3.fromRGB(142, 142, 142);
+    AccentColor = Color3.fromRGB(190, 198, 209);
+    DisabledAccentColor = Color3.fromRGB(104, 111, 121);
 
-    OutlineColor = Color3.fromRGB(50, 50, 50);
-    DisabledOutlineColor = Color3.fromRGB(70, 70, 70);
+    OutlineColor = Color3.fromRGB(55, 61, 70);
+    DisabledOutlineColor = Color3.fromRGB(45, 49, 56);
 
-    DisabledTextColor = Color3.fromRGB(142, 142, 142);
+    DisabledTextColor = Color3.fromRGB(125, 131, 140);
 
     RiskColor = Color3.fromRGB(255, 50, 50);
 
     Black = Color3.new(0, 0, 0);
-    Font = Enum.Font.Code,
+    Font = Enum.Font.RobotoMono,
 
     -- frames --
     OpenedFrames = {};
@@ -6631,13 +6631,26 @@ function Library:CreateWindow(...)
     })
 
     local WindowLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 7, 0, 0);
-        Size = UDim2.new(0, 0, 0, 25);
-        Text = WindowInfo.Title or "";
-        TextXAlignment = Enum.TextXAlignment.Left;
+        Position = UDim2.new(0, 34, 0, 0);
+        Size = UDim2.new(1, -68, 0, 25);
+        Text = string.upper(WindowInfo.Title or "");
+        TextXAlignment = Enum.TextXAlignment.Center;
         ZIndex = 1;
         Parent = Inner;
     })
+
+    local BrandMark = Library:CreateLabel({
+        Position = UDim2.new(0, 8, 0, 0);
+        Size = UDim2.new(0, 22, 0, 25);
+        Text = "✦";
+        TextSize = 18;
+        TextColor3 = Library.AccentColor;
+        TextXAlignment = Enum.TextXAlignment.Center;
+        ZIndex = 2;
+        Parent = Inner;
+    })
+
+    Library:AddToRegistry(BrandMark, { TextColor3 = "AccentColor" })
 
     local MainSectionOuter = Library:Create("Frame", {
         BackgroundColor3 = Library.BackgroundColor;
@@ -6685,6 +6698,7 @@ function Library:CreateWindow(...)
         FillDirection = Enum.FillDirection.Horizontal;
         SortOrder = Enum.SortOrder.LayoutOrder;
         VerticalAlignment = Enum.VerticalAlignment.Center;
+        HorizontalAlignment = Enum.HorizontalAlignment.Center;
         Parent = TabArea;
     })
 
@@ -7650,15 +7664,22 @@ end
                 BackgroundColor3 = "AccentColor";
             })
 
-            -- local GroupboxLabel = 
-            Library:CreateLabel({
-                Size = UDim2.new(1, 0, 0, 18);
-                Position = UDim2.new(0, 4, 0, 2);
+            local GroupboxLabelWidth = Library:GetTextBounds(Info.Name, Library.Font, 14) + 16
+            local GroupboxLabel = Library:CreateLabel({
+                Size = UDim2.new(0, GroupboxLabelWidth, 0, 18);
+                Position = UDim2.new(0.5, -GroupboxLabelWidth / 2, 0, 2);
                 TextSize = 14;
                 Text = Info.Name;
-                TextXAlignment = Enum.TextXAlignment.Left;
-                ZIndex = 5;
+                TextXAlignment = Enum.TextXAlignment.Center;
+                BackgroundColor3 = Library.BackgroundColor;
+                BackgroundTransparency = 0;
+                ZIndex = 6;
                 Parent = BoxInner;
+            })
+
+            Library:AddToRegistry(GroupboxLabel, {
+                BackgroundColor3 = "BackgroundColor";
+                TextColor3 = "FontColor";
             })
 
             local Container = Library:Create("Frame", {

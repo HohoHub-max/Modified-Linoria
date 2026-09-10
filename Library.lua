@@ -243,6 +243,7 @@ end
 local DPIScale = 1;
 local Library = {
     Registry = {};
+    CursorRole = "CursorNormal";
     RegistryMap = {};
     HudRegistry = {};
 
@@ -538,6 +539,14 @@ function Library:Create(Class, Properties)
         end
     end
 
+    if _Instance:IsA("TextBox") then
+        _Instance.MouseEnter:Connect(function() Library.CursorRole = "CursorText" end)
+        _Instance.MouseLeave:Connect(function() Library.CursorRole = "CursorNormal" end)
+    elseif _Instance:IsA("GuiButton") then
+        _Instance.MouseEnter:Connect(function() Library.CursorRole = "CursorLink" end)
+        _Instance.MouseLeave:Connect(function() Library.CursorRole = "CursorNormal" end)
+    end
+
     return _Instance
 end
 
@@ -573,6 +582,8 @@ end
 function Library:MakeDraggable(Instance, Cutoff, IsMainWindow)
     Instance.Active = true
     Instance:SetAttribute("LinoriaCursor", "CursorMove")
+    Instance.MouseEnter:Connect(function() Library.CursorRole = "CursorMove" end)
+    Instance.MouseLeave:Connect(function() Library.CursorRole = "CursorNormal" end)
 
     if Library.IsMobile == false then
         Instance.InputBegan:Connect(function(Input)
@@ -764,10 +775,12 @@ function Library:MakeResizable(Instance, MinSize)
     end)
 
     ResizerImage.MouseEnter:Connect(function()
+        Library.CursorRole = "CursorResizeDiagonal1"
         FinishResize(ResizerImage_HoverTransparency)
     end)
 
     ResizerImage.MouseLeave:Connect(function()
+        Library.CursorRole = "CursorNormal"
         FinishResize(1)
     end)
 
@@ -8024,22 +8037,9 @@ end
                     CursorImage.Position = UDim2.fromOffset(MousePosition.X - GuiInset.X, MousePosition.Y - GuiInset.Y)
                     CursorImage.Visible = Library.ShowCustomCursor
 
-                    local CursorAsset = "CursorNormal"
-                    local GuiObjects = GuiService:GetGuiObjectsAtPosition(MousePosition.X, MousePosition.Y)
-                    for _, GuiObject in ipairs(GuiObjects) do
-                        if GuiObject ~= CursorImage and GuiObject:IsDescendantOf(ScreenGui) then
-                            local ExplicitCursor = GuiObject:GetAttribute("LinoriaCursor")
-                            if typeof(ExplicitCursor) == "string" and CustomImageManagerAssets[ExplicitCursor] then
-                                CursorAsset = ExplicitCursor
-                                break
-                            elseif GuiObject:IsA("TextBox") then
-                                CursorAsset = "CursorText"
-                                break
-                            elseif GuiObject:IsA("GuiButton") and GuiObject.Active ~= false then
-                                CursorAsset = "CursorLink"
-                                break
-                            end
-                        end
+                    local CursorAsset = Library.CursorRole
+                    if typeof(CursorAsset) ~= "string" or not CustomImageManagerAssets[CursorAsset] then
+                        CursorAsset = "CursorNormal"
                     end
 
                     if CursorAsset ~= CurrentCursorAsset then

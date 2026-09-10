@@ -964,6 +964,7 @@ end
 
 function Library:OnHighlight(HighlightInstance, Instance, Properties, PropertiesDefault, condition)
     local function undoHighlight()
+        Library.CursorRole = "CursorNormal"
         local Reg = Library.RegistryMap[Instance]
 
         for Property, ColorIdx in next, PropertiesDefault do
@@ -985,6 +986,8 @@ function Library:OnHighlight(HighlightInstance, Instance, Properties, Properties
             undoHighlight()
             return
         end
+
+        Library.CursorRole = "CursorLink"
 
         local Reg = Library.RegistryMap[Instance]
 

@@ -103,19 +103,6 @@ local CustomImageManagerAssets = {
     },
 
     CursorLink = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/LinkSelect.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Link%20Select.png", Id = nil },
-    CursorText = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/TextSelect.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Text%20Select.png", Id = nil },
-    CursorMove = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/Move.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Move.png", Id = nil },
-    CursorResizeHorizontal = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/HorizontalResize.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Horizontal%20Resize.png", Id = nil },
-    CursorResizeVertical = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/VerticalResize.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Vertical%20Resize.png", Id = nil },
-    CursorResizeDiagonal1 = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/DiagonalResize1.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Diagonal%20Resize%201.png", Id = nil },
-    CursorResizeDiagonal2 = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/DiagonalResize2.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Diagonal%20Resize%202.png", Id = nil },
-    CursorUnavailable = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/Unavailable.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Unavailable.png", Id = nil },
-    CursorHelp = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/HelpSelect.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Help%20Select.png", Id = nil },
-    CursorBusy = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/Busy.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Busy.png", Id = nil },
-    CursorWorking = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/WorkingInBackground.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Working%20In%20Background.png", Id = nil },
-    CursorPrecision = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/PrecisionSelect.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Precision%20Select.png", Id = nil },
-    CursorHandwriting = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/Handwriting.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Handwriting.png", Id = nil },
-    CursorAlternate = { RobloxId = 9619665977, Path = "LinoriaLib/assets/cursors/anathema-dark-gray/AlternateSelect.png", URL = BaseURL .. "assets/cursors/anathema-dark-gray/Anathema%20Alternate%20Select.png", Id = nil },
 
     DropdownArrow = {
         RobloxId = 6282522798,
@@ -539,10 +526,7 @@ function Library:Create(Class, Properties)
         end
     end
 
-    if _Instance:IsA("TextBox") then
-        _Instance.MouseEnter:Connect(function() Library.CursorRole = "CursorText" end)
-        _Instance.MouseLeave:Connect(function() Library.CursorRole = "CursorNormal" end)
-    elseif _Instance:IsA("GuiButton") then
+    if _Instance:IsA("GuiButton") then
         _Instance.MouseEnter:Connect(function() Library.CursorRole = "CursorLink" end)
         _Instance.MouseLeave:Connect(function() Library.CursorRole = "CursorNormal" end)
     end
@@ -581,9 +565,6 @@ end
 
 function Library:MakeDraggable(Instance, Cutoff, IsMainWindow)
     Instance.Active = true
-    Instance:SetAttribute("LinoriaCursor", "CursorMove")
-    Instance.MouseEnter:Connect(function() Library.CursorRole = "CursorMove" end)
-    Instance.MouseLeave:Connect(function() Library.CursorRole = "CursorNormal" end)
 
     if Library.IsMobile == false then
         Instance.InputBegan:Connect(function(Input)
@@ -729,7 +710,6 @@ function Library:MakeResizable(Instance, MinSize)
         ZIndex = 2;
         Parent = Resizer;
     })
-    ResizerImage:SetAttribute("LinoriaCursor", "CursorResizeDiagonal1")
 
     local ResizerImageUICorner = Library:Create("UICorner", {
         CornerRadius = UDim.new(0.5, 0);
@@ -775,12 +755,11 @@ function Library:MakeResizable(Instance, MinSize)
     end)
 
     ResizerImage.MouseEnter:Connect(function()
-        Library.CursorRole = "CursorResizeDiagonal1"
+        Library.CursorRole = "CursorNormal"
         FinishResize(ResizerImage_HoverTransparency)
     end)
 
     ResizerImage.MouseLeave:Connect(function()
-        Library.CursorRole = "CursorNormal"
         FinishResize(1)
     end)
 

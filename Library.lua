@@ -8,6 +8,7 @@ local Teams: Teams = cloneref(game:GetService("Teams"))
 local Players: Players = cloneref(game:GetService("Players"))
 local RunService: RunService = cloneref(game:GetService("RunService"))
 local TweenService: TweenService = cloneref(game:GetService("TweenService"))
+local GuiService: GuiService = cloneref(game:GetService("GuiService"))
 
 local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
 local Mouse = cloneref(LocalPlayer:GetMouse())
@@ -95,7 +96,7 @@ local CustomImageManager = {}
 local CustomImageManagerAssets = {
     Cursor = {
         RobloxId = 9619665977,
-        Path = "LinoriaLib/assets/Cursor.png",
+        Path = "LinoriaLib/assets/PoseidonCursor.png",
         URL = BaseURL .. "assets/Cursor.png",
 
         Id = nil,
@@ -2069,7 +2070,7 @@ do
             AnchorPoint = Vector2.new(0.5, 0.5);
             Size = UDim2.new(0, 6, 0, 6);
             BackgroundTransparency = 1;
-            Image = CustomImageManager.GetAsset("Cursor");
+            Image = "rbxassetid://9619665977";
             ImageColor3 = Color3.new(0, 0, 0);
             ZIndex = 19;
             Parent = SatVibMap;
@@ -2080,7 +2081,7 @@ do
             Size = UDim2.new(0, CursorOuter.Size.X.Offset - 2, 0, CursorOuter.Size.Y.Offset - 2);
             Position = UDim2.new(0, 1, 0, 1);
             BackgroundTransparency = 1;
-            Image = CustomImageManager.GetAsset("Cursor");
+            Image = "rbxassetid://9619665977";
             ZIndex = 20;
             Parent = CursorOuter;
         })
@@ -7983,7 +7984,35 @@ end
             -- A bit scuffed, but if we're going from not toggled -> toggled we want to show the frame immediately so that the fade is visible.
             Outer.Visible = true
 
-            if DrawingLib.drawing_replaced ~= true and IsBadDrawingLib ~= true then
+            if typeof(getcustomasset) == "function" then
+                local CursorImage = Library:Create("ImageLabel", {
+                    BackgroundTransparency = 1;
+                    BorderSizePixel = 0;
+                    Image = CustomImageManager.GetAsset("Cursor");
+                    Position = UDim2.fromOffset(0, 0);
+                    Size = UDim2.fromOffset(34, 34);
+                    ZIndex = 9999;
+                    Visible = Library.ShowCustomCursor;
+                    Parent = ScreenGui;
+                })
+
+                local OldMouseIconState = InputService.MouseIconEnabled
+                local ShowCursorBinding = Library.ShowCursorBinding
+                pcall(function() RunService:UnbindFromRenderStep(ShowCursorBinding) end)
+                RunService:BindToRenderStep(ShowCursorBinding, Enum.RenderPriority.Camera.Value - 1, function()
+                    InputService.MouseIconEnabled = not Library.ShowCustomCursor
+                    local MousePosition = InputService:GetMouseLocation()
+                    local GuiInset = GuiService:GetGuiInset()
+                    CursorImage.Position = UDim2.fromOffset(MousePosition.X - GuiInset.X, MousePosition.Y - GuiInset.Y)
+                    CursorImage.Visible = Library.ShowCustomCursor
+
+                    if not Toggled or (not ScreenGui or not ScreenGui.Parent) then
+                        InputService.MouseIconEnabled = OldMouseIconState
+                        CursorImage:Destroy()
+                        RunService:UnbindFromRenderStep(ShowCursorBinding)
+                    end
+                end)
+            elseif DrawingLib.drawing_replaced ~= true and IsBadDrawingLib ~= true then
                 IsBadDrawingLib = not (pcall(function()
                     local Cursor = DrawingLib.new("Triangle")
                     Cursor.Thickness = 1

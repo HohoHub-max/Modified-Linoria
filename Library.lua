@@ -7655,9 +7655,21 @@ end
             local Highlight = Library:Create("Frame", {
                 BackgroundColor3 = Library.AccentColor;
                 BorderSizePixel = 0;
-                Size = UDim2.new(1, 0, 0, 2);
+                Position = UDim2.new(0, 8, 0, 20);
+                Size = UDim2.new(1, -16, 0, 1);
                 ZIndex = 5;
                 Parent = BoxInner;
+            })
+
+            Library:Create("UIGradient", {
+                Transparency = NumberSequence.new({
+                    NumberSequenceKeypoint.new(0, 0.78),
+                    NumberSequenceKeypoint.new(0.2, 0.35),
+                    NumberSequenceKeypoint.new(0.5, 0),
+                    NumberSequenceKeypoint.new(0.8, 0.35),
+                    NumberSequenceKeypoint.new(1, 0.78),
+                });
+                Parent = Highlight;
             })
 
             Library:AddToRegistry(Highlight, {
@@ -7671,21 +7683,19 @@ end
                 TextSize = 14;
                 Text = Info.Name;
                 TextXAlignment = Enum.TextXAlignment.Center;
-                BackgroundColor3 = Library.BackgroundColor;
-                BackgroundTransparency = 0;
+                BackgroundTransparency = 1;
                 ZIndex = 6;
                 Parent = BoxInner;
             })
 
             Library:AddToRegistry(GroupboxLabel, {
-                BackgroundColor3 = "BackgroundColor";
                 TextColor3 = "FontColor";
             })
 
             local Container = Library:Create("Frame", {
                 BackgroundTransparency = 1;
-                Position = UDim2.new(0, 4, 0, 20);
-                Size = UDim2.new(1, -4, 1, -20);
+                Position = UDim2.new(0, 4, 0, 24);
+                Size = UDim2.new(1, -4, 1, -24);
                 ZIndex = 1;
                 Parent = BoxInner;
             })
@@ -7705,7 +7715,7 @@ end
                     end
                 end
 
-                BoxOuter.Size = UDim2.new(1, 0, 0, (20 * DPIScale + Size) + 2 + 2)
+                BoxOuter.Size = UDim2.new(1, 0, 0, (24 * DPIScale + Size) + 2 + 2)
             end
 
             Groupbox.Container = Container

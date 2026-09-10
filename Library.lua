@@ -6719,6 +6719,18 @@ function Library:CreateWindow(...)
         Parent = TabArea;
     })
 
+    local TabRail = Library:Create("Frame", {
+        BackgroundColor3 = Library.OutlineColor;
+        BackgroundTransparency = 0.35;
+        BorderSizePixel = 0;
+        Position = UDim2.new(0, 12, 0, 28);
+        Size = UDim2.new(1, -24, 0, 1);
+        ZIndex = 1;
+        Parent = MainSectionInner;
+    })
+
+    Library:AddToRegistry(TabRail, { BackgroundColor3 = "OutlineColor" })
+
     Library:Create("Frame", {
         BackgroundColor3 = Library.BackgroundColor;
         BorderColor3 = Library.OutlineColor;
@@ -7288,6 +7300,7 @@ function Library:CreateWindow(...)
             Groupboxes = {};
             Tabboxes = {};
             DependencyGroupboxes = {};
+            IsActive = false;
             WarningBox = {
                 Bottom = false,
                 IsNormal = false,
@@ -7304,38 +7317,50 @@ function Library:CreateWindow(...)
         local TabButtonWidth = Library:GetTextBounds(Tab.Name, Library.Font, 16)
 
         local TabButton = Library:Create("Frame", {
-            BackgroundColor3 = Library.BackgroundColor;
-            BorderColor3 = Library.OutlineColor;
-            Size = UDim2.new(0, TabButtonWidth + 8 + 4, 0.85, 0);
-            ZIndex = 1;
+            Active = true;
+            BackgroundColor3 = Library.MainColor;
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+            Size = UDim2.new(0, TabButtonWidth + 20, 0, 23);
+            ZIndex = 2;
             Parent = TabArea;
         })
 
         Library:AddToRegistry(TabButton, {
-            BackgroundColor3 = "BackgroundColor";
-            BorderColor3 = "OutlineColor";
+            BackgroundColor3 = "MainColor";
         })
 
         local TabButtonLabel = Library:CreateLabel({
             Position = UDim2.new(0, 0, 0, 0);
             Size = UDim2.new(1, 0, 1, -1);
             Text = Tab.Name;
-            ZIndex = 1;
-            Parent = TabButton;
-        })
-
-        local Blocker = Library:Create("Frame", {
-            BackgroundColor3 = Library.MainColor;
-            BorderSizePixel = 0;
-            Position = UDim2.new(0, 0, 1, 0);
-            Size = UDim2.new(1, 0, 0, 1);
-            BackgroundTransparency = 1;
+            TextTransparency = 0.28;
             ZIndex = 3;
             Parent = TabButton;
         })
 
+        local Blocker = Library:Create("Frame", {
+            BackgroundColor3 = Library.AccentColor;
+            BorderSizePixel = 0;
+            Position = UDim2.new(0, 6, 1, -2);
+            Size = UDim2.new(1, -12, 0, 2);
+            BackgroundTransparency = 1;
+            ZIndex = 4;
+            Parent = TabButton;
+        })
+
         Library:AddToRegistry(Blocker, {
-            BackgroundColor3 = "MainColor";
+            BackgroundColor3 = "AccentColor";
+        })
+
+        Library:Create("UIGradient", {
+            Transparency = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 0.7),
+                NumberSequenceKeypoint.new(0.18, 0.1),
+                NumberSequenceKeypoint.new(0.82, 0.1),
+                NumberSequenceKeypoint.new(1, 0.7),
+            });
+            Parent = Blocker;
         })
 
         local TabFrame = Library:Create("Frame", {
@@ -7596,9 +7621,10 @@ end
                 Tab:HideTab()
             end
 
-            Blocker.BackgroundTransparency = 0
-            TabButton.BackgroundColor3 = Library.MainColor
-            Library.RegistryMap[TabButton].Properties.BackgroundColor3 = "MainColor"
+            Tab.IsActive = true
+            TweenService:Create(Blocker, TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = 0 }):Play()
+            TweenService:Create(TabButton, TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = 0.55 }):Play()
+            TweenService:Create(TabButtonLabel, TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { TextTransparency = 0 }):Play()
             TabFrame.Visible = true
 
             Tab:Resize()
@@ -7606,9 +7632,10 @@ end
         Tab.Show = Tab.ShowTab
 
         function Tab:HideTab()
+            Tab.IsActive = false
             Blocker.BackgroundTransparency = 1
-            TabButton.BackgroundColor3 = Library.BackgroundColor
-            Library.RegistryMap[TabButton].Properties.BackgroundColor3 = "BackgroundColor"
+            TabButton.BackgroundTransparency = 1
+            TabButtonLabel.TextTransparency = 0.28
             TabFrame.Visible = false
         end
         Tab.Hide = Tab.HideTab
@@ -7628,7 +7655,7 @@ end
 
                 local TabButtonWidth = Library:GetTextBounds(Tab.Name, Library.Font, 16)
 
-                TabButton.Size = UDim2.new(0, TabButtonWidth + 8 + 4, 0.85, 0)
+                TabButton.Size = UDim2.new(0, TabButtonWidth + 20, 0, 23)
                 TabButtonLabel.Text = Tab.Name
             end
         end
@@ -7962,6 +7989,22 @@ end
         TabButton.InputBegan:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                 Tab:ShowTab()
+            end
+        end)
+
+        TabButton.MouseEnter:Connect(function()
+            Library.CursorRole = "CursorLink"
+            if not Tab.IsActive then
+                TweenService:Create(TabButton, TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = 0.72 }):Play()
+                TweenService:Create(TabButtonLabel, TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { TextTransparency = 0.06 }):Play()
+            end
+        end)
+
+        TabButton.MouseLeave:Connect(function()
+            Library.CursorRole = "CursorNormal"
+            if not Tab.IsActive then
+                TweenService:Create(TabButton, TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = 1 }):Play()
+                TweenService:Create(TabButtonLabel, TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { TextTransparency = 0.28 }):Play()
             end
         end)
 

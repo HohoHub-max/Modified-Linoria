@@ -54,8 +54,8 @@ local ThemeManager = {} do
 
 	ThemeManager.Library = nil
 	ThemeManager.BuiltInThemes = {
-		['Default']       = { 1, { FontColor = "ebeef2", MainColor = "16191d", AccentColor = "bec6d1", BackgroundColor = "0d0f12", OutlineColor = "373d46" } },
-		['Poseidon']      = { 2, { FontColor = "f1f3f5", MainColor = "191c21", AccentColor = "cbd2dc", BackgroundColor = "0b0d10", OutlineColor = "454c57" } },
+		['Default']       = { 1, { FontColor = "e8edf3", MainColor = "15191e", AccentColor = "91abc8", BackgroundColor = "0b0e12", OutlineColor = "343d49" } },
+		['Poseidon']      = { 2, { FontColor = "edf2f7", MainColor = "171c22", AccentColor = "9bb6d4", BackgroundColor = "0a0d11", OutlineColor = "394553" } },
 		['BBot']          = { 2, { FontColor = "ffffff", MainColor = "1e1e1e", AccentColor = "7e48a3", BackgroundColor = "232323", OutlineColor = "141414" } },
 		['Fatality']      = { 3, { FontColor = "ffffff", MainColor = "1e1842", AccentColor = "c50754", BackgroundColor = "191335", OutlineColor = "3c355d" } },
 		['Jester']        = { 4, { FontColor = "ffffff", MainColor = "242424", AccentColor = "db4467", BackgroundColor = "1c1c1c", OutlineColor = "373737" } },

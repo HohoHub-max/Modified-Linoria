@@ -231,6 +231,10 @@ local DPIScale = 1;
 local Library = {
     Registry = {};
     CursorRole = "CursorNormal";
+    CursorHotspots = {
+        CursorNormal = Vector2.new(1, 3);
+        CursorLink = Vector2.new(20, 0);
+    };
     RegistryMap = {};
     HudRegistry = {};
 
@@ -8016,7 +8020,6 @@ end
                     InputService.MouseIconEnabled = not Library.ShowCustomCursor
                     local MousePosition = InputService:GetMouseLocation()
                     local GuiInset = GuiService:GetGuiInset()
-                    CursorImage.Position = UDim2.fromOffset(MousePosition.X - GuiInset.X, MousePosition.Y - GuiInset.Y)
                     CursorImage.Visible = Library.ShowCustomCursor
 
                     local CursorAsset = Library.CursorRole
@@ -8028,6 +8031,11 @@ end
                         CurrentCursorAsset = CursorAsset
                         CursorImage.Image = CustomImageManager.GetAsset(CursorAsset)
                     end
+
+                    CursorImage.Position = UDim2.fromOffset(
+                        MousePosition.X - GuiInset.X - Library.CursorHotspots[CursorAsset].X,
+                        MousePosition.Y - GuiInset.Y - Library.CursorHotspots[CursorAsset].Y
+                    )
 
                     if not Toggled or (not ScreenGui or not ScreenGui.Parent) then
                         InputService.MouseIconEnabled = OldMouseIconState

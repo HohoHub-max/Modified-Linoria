@@ -235,6 +235,7 @@ local Library = {
         CursorNormal = Vector2.new(1, 3);
         CursorLink = Vector2.new(20, 0);
     };
+    CornerRadius = UDim.new(0, 3);
     RegistryMap = {};
     HudRegistry = {};
 
@@ -786,8 +787,10 @@ function Library:AddToolTip(InfoStr, DisabledInfoStr, HoverInstance)
         Visible = false;
     })
 
+    Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = Tooltip })
+
     local Label = Library:CreateLabel({
-        Position = UDim2.fromOffset(3, 1);
+        Position = UDim2.fromOffset(7, 4);
         
         TextSize = 14;
         Text = InfoStr;
@@ -818,11 +821,12 @@ function Library:AddToolTip(InfoStr, DisabledInfoStr, HoverInstance)
     local function UpdateText(Text)
         if Text == nil then return end
 
-        local X, Y = Library:GetTextBounds(Text, Library.Font, 14 * DPIScale)
+        local X, Y = Library:GetTextBounds(Text, Library.Font, 14 * DPIScale, Vector2.new(260 * DPIScale, 10000))
 
         Label.Text = Text
-        Tooltip.Size = UDim2.fromOffset(X + 5, Y + 4)
-        Label.Size = UDim2.fromOffset(X, Y)
+        Label.TextWrapped = true
+        Tooltip.Size = UDim2.fromOffset(math.min(X, 260 * DPIScale) + 14, Y + 8)
+        Label.Size = UDim2.fromOffset(math.min(X, 260 * DPIScale), Y)
     end
 
     local function GiveSignal(Connection: RBXScriptConnection | RBXScriptSignal)
@@ -873,7 +877,11 @@ function Library:AddToolTip(InfoStr, DisabledInfoStr, HoverInstance)
         IsHovering = true
 
         Tooltip.Position = UDim2.fromOffset(Mouse.X + 15, Mouse.Y + 12)
+        Tooltip.BackgroundTransparency = 1
+        Label.TextTransparency = 1
         Tooltip.Visible = true
+        TweenService:Create(Tooltip, TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = 0 }):Play()
+        TweenService:Create(Label, TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { TextTransparency = 0 }):Play()
 
         while IsHovering do
             if TooltipTable.Disabled == true and DisabledInfoStr == nil then break end
@@ -2683,6 +2691,9 @@ do
             Parent = DropdownOuter;
         })
 
+        Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = DropdownOuter })
+        Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = DropdownInner })
+
         Library:AddToRegistry(DropdownInner, {
             BackgroundColor3 = "MainColor";
             BorderColor3 = "OutlineColor";
@@ -2801,6 +2812,9 @@ do
             ZIndex = 21;
             Parent = ListOuter;
         })
+
+        Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = ListOuter })
+        Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = ListInner })
 
         Library:AddToRegistry(ListInner, {
             BackgroundColor3 = "MainColor";
@@ -3124,7 +3138,7 @@ do
             
             ListOuter.Visible = true
             Library.OpenedFrames[ListOuter] = true
-            DropdownArrow.Rotation = 180
+            TweenService:Create(DropdownArrow, TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Rotation = 180 }):Play()
 
             Dropdown:Display()
             RecalculateListSize()
@@ -3143,7 +3157,7 @@ do
         
             ListOuter.Visible = false
             Library.OpenedFrames[ListOuter] = nil
-            DropdownArrow.Rotation = 0
+            TweenService:Create(DropdownArrow, TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Rotation = 0 }):Play()
 
             Dropdown:Display()
             RecalculateListSize()
@@ -3549,6 +3563,9 @@ do
                 Parent = Outer;
             })
 
+            Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = Outer })
+            Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = Inner })
+
             local Label = Library:CreateLabel({
                 Size = UDim2.new(1, 0, 1, 0);
                 TextSize = 14;
@@ -3580,6 +3597,13 @@ do
                 { BorderColor3 = "AccentColor" },
                 { BorderColor3 = "Black" }
             )
+
+            Outer.MouseEnter:Connect(function()
+                TweenService:Create(Inner, TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = 0.08 }):Play()
+            end)
+            Outer.MouseLeave:Connect(function()
+                TweenService:Create(Inner, TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = 0 }):Play()
+            end)
 
             return Outer, Inner, Label
         end
@@ -3624,6 +3648,8 @@ do
                 if not ValidateClick(Input) then return end
                 if Button.Locked then return end
 
+                TweenService:Create(Button.Label, TweenInfo.new(0.06, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Position = UDim2.fromOffset(0, 1) }):Play()
+
                 if Button.DoubleClick then
                     Library:RemoveFromRegistry(Button.Label)
                     Library:AddToRegistry(Button.Label, { TextColor3 = "AccentColor" })
@@ -3649,6 +3675,12 @@ do
                 end
 
                 Library:SafeCallback(Button.Func)
+            end)
+
+            Button.Outer.InputEnded:Connect(function(Input)
+                if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                    TweenService:Create(Button.Label, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Position = UDim2.fromOffset(0, 0) }):Play()
+                end
             end)
         end
 
@@ -3827,6 +3859,9 @@ do
             ZIndex = 6;
             Parent = TextBoxOuter;
         })
+
+        Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = TextBoxOuter })
+        Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = TextBoxInner })
 
         Library:AddToRegistry(TextBoxInner, {
             BackgroundColor3 = "MainColor";
@@ -4056,7 +4091,7 @@ do
         local ToggleOuter = Library:Create("Frame", {
             BackgroundColor3 = Color3.new(0, 0, 0);
             BorderColor3 = Color3.new(0, 0, 0);
-            Size = UDim2.new(0, 13, 0, 13);
+            Size = UDim2.new(0, 24, 0, 13);
             Visible = Toggle.Visible;
             ZIndex = 5;
             Parent = ToggleContainer;
@@ -4075,14 +4110,29 @@ do
             Parent = ToggleOuter;
         })
 
+        Library:Create("UICorner", { CornerRadius = UDim.new(0, 6); Parent = ToggleOuter })
+        Library:Create("UICorner", { CornerRadius = UDim.new(0, 6); Parent = ToggleInner })
+
+        local ToggleKnob = Library:Create("Frame", {
+            AnchorPoint = Vector2.new(0, 0.5);
+            BackgroundColor3 = Library.FontColor;
+            BorderSizePixel = 0;
+            Position = UDim2.new(0, 2, 0.5, 0);
+            Size = UDim2.fromOffset(9, 9);
+            ZIndex = 7;
+            Parent = ToggleInner;
+        })
+        Library:Create("UICorner", { CornerRadius = UDim.new(1, 0); Parent = ToggleKnob })
+        Library:AddToRegistry(ToggleKnob, { BackgroundColor3 = "FontColor" })
+
         Library:AddToRegistry(ToggleInner, {
             BackgroundColor3 = "MainColor";
             BorderColor3 = "OutlineColor";
         })
 
         local ToggleLabel = Library:CreateLabel({
-            Size = UDim2.new(1, -19, 0, 11); -- size of toggle box (13) + size offset of previous layout (6)
-            Position = UDim2.new(0, 19, 0, 0);
+            Size = UDim2.new(1, -30, 0, 11);
+            Position = UDim2.new(0, 30, 0, 0);
             TextSize = 14;
             Text = Info.Text;
             TextXAlignment = Enum.TextXAlignment.Left;
@@ -4131,6 +4181,9 @@ do
         end
 
         function Toggle:Display()
+            TweenService:Create(ToggleKnob, TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Position = Toggle.Value and UDim2.new(0, 13, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)
+            }):Play()
             if Toggle.Disabled then
                 ToggleLabel.TextColor3 = Library.DisabledTextColor
 
@@ -4331,6 +4384,9 @@ do
             Parent = SliderOuter;
         })
 
+        Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = SliderOuter })
+        Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = SliderInner })
+
         Library:AddToRegistry(SliderInner, {
             BackgroundColor3 = "MainColor";
             BorderColor3 = "OutlineColor";
@@ -4343,6 +4399,36 @@ do
             ZIndex = 7;
             Parent = SliderInner;
         })
+
+        Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = Fill })
+
+        local FillGradient = Library:Create("UIGradient", {
+            Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.AccentColor)),
+                ColorSequenceKeypoint.new(1, Library.AccentColor),
+            });
+            Parent = Fill;
+        })
+        Library:AddToRegistry(FillGradient, {
+            Color = function()
+                return ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.AccentColor)),
+                    ColorSequenceKeypoint.new(1, Library.AccentColor),
+                })
+            end
+        })
+
+        local FillThumb = Library:Create("Frame", {
+            AnchorPoint = Vector2.new(0.5, 0.5);
+            BackgroundColor3 = Library.FontColor;
+            BorderSizePixel = 0;
+            Position = UDim2.new(1, 0, 0.5, 0);
+            Size = UDim2.fromOffset(7, 7);
+            ZIndex = 9;
+            Parent = Fill;
+        })
+        Library:Create("UICorner", { CornerRadius = UDim.new(1, 0); Parent = FillThumb })
+        Library:AddToRegistry(FillThumb, { BackgroundColor3 = "FontColor" })
 
         Library:AddToRegistry(Fill, {
             BackgroundColor3 = "AccentColor";
@@ -4426,6 +4512,7 @@ do
 
             local X = Library:MapValue(Slider.Value, Slider.Min, Slider.Max, 0, 1)
             Fill.Size = UDim2.new(X, 0, 1, 0)
+            FillThumb.Visible = X > 0
 
             -- I have no idea what this is
             HideBorderRight.Visible = not (X == 1 or X == 0)
@@ -4712,6 +4799,9 @@ do
             Parent = DropdownOuter;
         })
 
+        Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = DropdownOuter })
+        Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = DropdownInner })
+
         Library:AddToRegistry(DropdownInner, {
             BackgroundColor3 = "MainColor";
             BorderColor3 = "OutlineColor";
@@ -4827,6 +4917,9 @@ do
             ZIndex = 21;
             Parent = ListOuter;
         })
+
+        Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = ListOuter })
+        Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = ListInner })
 
         Library:AddToRegistry(ListInner, {
             BackgroundColor3 = "MainColor";
@@ -5143,7 +5236,7 @@ do
 
             ListOuter.Visible = true
             Library.OpenedFrames[ListOuter] = true
-            DropdownArrow.Rotation = 180
+            TweenService:Create(DropdownArrow, TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Rotation = 180 }):Play()
 
             RecalculateListSize()
         end
@@ -5161,7 +5254,7 @@ do
 
             ListOuter.Visible = false
             Library.OpenedFrames[ListOuter] = nil
-            DropdownArrow.Rotation = 0
+            TweenService:Create(DropdownArrow, TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Rotation = 0 }):Play()
         end
 
         function Dropdown:OnChanged(Func)
@@ -6181,6 +6274,9 @@ do
         Parent = KeybindOuter;
     })
 
+    Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = KeybindOuter })
+    Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = KeybindInner })
+
     Library:AddToRegistry(KeybindInner, {
         BackgroundColor3 = "MainColor";
         BorderColor3 = "OutlineColor";
@@ -6394,7 +6490,7 @@ do
             Parent = Side == "left" and Library.LeftNotificationArea or Library.RightNotificationArea;
         })
 
-        local NotifyInner = Library:Create("Frame", {
+    local NotifyInner = Library:Create("Frame", {
             BackgroundColor3 = Library.MainColor;
             BorderColor3 = Library.OutlineColor;
             BorderMode = Enum.BorderMode.Inset;
@@ -6402,6 +6498,9 @@ do
             ZIndex = 11001;
             Parent = NotifyOuter;
         })
+
+        Library:Create("UICorner", { CornerRadius = UDim.new(0, 4); Parent = NotifyOuter })
+        Library:Create("UICorner", { CornerRadius = UDim.new(0, 4); Parent = NotifyInner })
 
         Library:AddToRegistry(NotifyInner, {
             BackgroundColor3 = "MainColor";
@@ -6503,6 +6602,19 @@ do
             BackgroundColor3 = "AccentColor";
         }, true)
 
+        local TimerBar = Library:Create("Frame", {
+            AnchorPoint = Vector2.new(0, 1);
+            BackgroundColor3 = Library.AccentColor;
+            BorderSizePixel = 0;
+            Position = UDim2.new(0, 3, 1, -1);
+            Size = UDim2.new(1, -6, 0, 2);
+            Visible = typeof(Data.Time) == "number" and Data.Time > 0;
+            ZIndex = 11005;
+            Parent = NotifyOuter;
+        })
+        Library:Create("UICorner", { CornerRadius = UDim.new(1, 0); Parent = TimerBar })
+        Library:AddToRegistry(TimerBar, { BackgroundColor3 = "AccentColor" }, true)
+
         function Data:Resize()
             XSize, YSize = Library:GetTextBounds(NotifyLabel.Text, Library.Font, 14)
             YSize = YSize + 7
@@ -6557,6 +6669,9 @@ do
 
         NotifyOuter.Visible = true
         pcall(NotifyOuter.TweenSize, NotifyOuter, UDim2.new(0, XSize * DPIScale + 8 + 4 + ExtraWidth, 0, YSize), "Out", "Quad", 0.4, true)
+        if TimerBar.Visible then
+            TweenService:Create(TimerBar, TweenInfo.new(Data.Time, Enum.EasingStyle.Linear), { Size = UDim2.new(0, 0, 0, 2) }):Play()
+        end
 
         task.delay(0.4, function()
             if Data.Persist then
@@ -6642,6 +6757,9 @@ function Library:CreateWindow(...)
         Parent = Outer;
     })
 
+    Library:Create("UICorner", { CornerRadius = UDim.new(0, 5); Parent = Outer })
+    Library:Create("UICorner", { CornerRadius = UDim.new(0, 4); Parent = Inner })
+
     Library:AddToRegistry(Inner, {
         BackgroundColor3 = "MainColor";
         BorderColor3 = "AccentColor";
@@ -6678,6 +6796,8 @@ function Library:CreateWindow(...)
         Parent = Inner;
     })
 
+    Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = MainSectionOuter })
+
     Library:AddToRegistry(MainSectionOuter, {
         BackgroundColor3 = "BackgroundColor";
         BorderColor3 = "OutlineColor";
@@ -6692,6 +6812,8 @@ function Library:CreateWindow(...)
         ZIndex = 1;
         Parent = MainSectionOuter;
     })
+
+    Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = MainSectionInner })
 
     Library:AddToRegistry(MainSectionInner, {
         BackgroundColor3 = "BackgroundColor";
@@ -6758,6 +6880,7 @@ function Library:CreateWindow(...)
         ZIndex = 2;
         Parent = MainSectionInner;
     })
+    Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = TabContainer })
     
     local InnerVideoBackground = Library:Create("VideoFrame", {
         BackgroundColor3 = Library.MainColor;
@@ -7466,7 +7589,9 @@ do
             CanvasSize = UDim2.new(0, 0, 0, 0);
             BottomImage = "";
             TopImage = "";
-            ScrollBarThickness = 0;
+            ScrollBarThickness = 2;
+            ScrollBarImageColor3 = Library.AccentColor;
+            ScrollBarImageTransparency = 0.35;
             ZIndex = 2;
             Parent = TabFrame;
         })
@@ -7479,10 +7604,15 @@ do
             CanvasSize = UDim2.new(0, 0, 0, 0);
             BottomImage = "";
             TopImage = "";
-            ScrollBarThickness = 0;
+            ScrollBarThickness = 2;
+            ScrollBarImageColor3 = Library.AccentColor;
+            ScrollBarImageTransparency = 0.35;
             ZIndex = 2;
             Parent = TabFrame;
         })
+
+        Library:AddToRegistry(LeftSide, { ScrollBarImageColor3 = "AccentColor" })
+        Library:AddToRegistry(RightSide, { ScrollBarImageColor3 = "AccentColor" })
 
         Tab.LeftSideFrame = LeftSide
         Tab.RightSideFrame = RightSide
@@ -7692,6 +7822,9 @@ end
                 Parent = BoxOuter;
             })
 
+            Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = BoxOuter })
+            Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = BoxInner })
+
             Library:AddToRegistry(BoxInner, {
                 BackgroundColor3 = "BackgroundColor";
             })
@@ -7809,6 +7942,9 @@ end
                 ZIndex = 4;
                 Parent = BoxOuter;
             })
+
+            Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = BoxOuter })
+            Library:Create("UICorner", { CornerRadius = Library.CornerRadius; Parent = BoxInner })
 
             Library:AddToRegistry(BoxInner, {
                 BackgroundColor3 = "BackgroundColor";

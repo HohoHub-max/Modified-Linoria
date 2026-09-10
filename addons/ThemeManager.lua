@@ -54,7 +54,8 @@ local ThemeManager = {} do
 
 	ThemeManager.Library = nil
 	ThemeManager.BuiltInThemes = {
-		['Default']       = { 1, { FontColor = "ffffff", MainColor = "1c1c1c", AccentColor = "0055ff", BackgroundColor = "141414", OutlineColor = "323232" } },
+		['Default']       = { 1, { FontColor = "ebeef2", MainColor = "16191d", AccentColor = "bec6d1", BackgroundColor = "0d0f12", OutlineColor = "373d46" } },
+		['Poseidon']      = { 2, { FontColor = "f1f3f5", MainColor = "191c21", AccentColor = "cbd2dc", BackgroundColor = "0b0d10", OutlineColor = "454c57" } },
 		['BBot']          = { 2, { FontColor = "ffffff", MainColor = "1e1e1e", AccentColor = "7e48a3", BackgroundColor = "232323", OutlineColor = "141414" } },
 		['Fatality']      = { 3, { FontColor = "ffffff", MainColor = "1e1842", AccentColor = "c50754", BackgroundColor = "191335", OutlineColor = "3c355d" } },
 		['Jester']        = { 4, { FontColor = "ffffff", MainColor = "242424", AccentColor = "db4467", BackgroundColor = "1c1c1c", OutlineColor = "373737" } },

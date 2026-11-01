@@ -1,0 +1,37 @@
+local library = assert(getgenv().Linoria, "Load Library.lua with LinoriaGuiParent set before running this test")
+local checks = {}
+local function check(condition, message)
+    assert(condition, message)
+    table.insert(checks, message)
+end
+local success, failure = xpcall(function()
+    local replicated = game:GetService("ReplicatedStorage")
+    local player = game:GetService("Players").LocalPlayer
+    check(library.ScreenGui.Parent == player.PlayerGui, "Explicit PlayerGui parent is respected")
+    local window = library:CreateWindow({Title = "Linoria runtime tests", AutoShow = false})
+    local tab = window:AddTab("Tests")
+    local box = tab:AddLeftGroupbox("Controls")
+    local label = box:AddLabel("Before")
+    box:AddToggle("RuntimeToggle", {Text = "Toggle", Default = false})
+    box:AddSlider("RuntimeSlider", {Text = "Slider", Default = 1, Min = 0, Max = 5, Rounding = 1})
+    box:AddDropdown("RuntimeDropdown", {Text = "Dropdown", Values = {"One", "Two"}, AllowNull = true})
+    local data = require(replicated.Controllers.Core.DataController):GetReplica().Data
+    require(replicated.Shared.Monetization.GamepassPerks).Has(data, "x8Egg")
+    label:SetText("After game callback")
+    check(label.TextLabel.Text == "After game callback", "Label remains writable after game-module calls")
+    library.Toggles.RuntimeToggle:SetValue(true)
+    check(library.Toggles.RuntimeToggle.Value, "Toggle remains writable in the game thread")
+    library.Options.RuntimeSlider:SetValue(2)
+    check(library.Options.RuntimeSlider.Value == 2, "Slider remains writable in the game thread")
+    library.Options.RuntimeDropdown:SetValue("Two")
+    check(library.Options.RuntimeDropdown.Value == "Two", "Dropdown remains writable in the game thread")
+    library.Options.RuntimeSlider:SetVisible(false)
+    library.Options.RuntimeDropdown:SetVisible(false)
+    check(not library.Options.RuntimeSlider.Visible and not library.Options.RuntimeDropdown.Visible, "Visibility mutators remain writable")
+    library:Unload()
+    check(library.Unloaded and library.ScreenGui.Parent == nil, "Unload destroys the root")
+    library:Unload()
+    check(library.Unloaded, "Repeated unload is harmless")
+end, debug.traceback)
+getgenv().LinoriaGuiParent = nil
+getgenv().TapSimLibraryTestResults = {Success = success, Error = if success then nil else tostring(failure), Passed = #checks, Checks = checks}

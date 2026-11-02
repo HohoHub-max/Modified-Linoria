@@ -3,7 +3,8 @@ local cloneref = (cloneref or clonereference or function(instance: any)
 end)
 local InputService: UserInputService = cloneref(game:GetService("UserInputService"))
 local TextService: TextService = cloneref(game:GetService("TextService"))
-local CoreGui: CoreGui = cloneref(game:GetService("CoreGui"))
+local ConfiguredGuiParent = if typeof(getgenv) == "function" then getgenv().LinoriaGuiParent else nil
+local CoreGui: Instance = if typeof(ConfiguredGuiParent) == "Instance" then ConfiguredGuiParent else cloneref(game:GetService("CoreGui"))
 local Teams: Teams = cloneref(game:GetService("Teams"))
 local Players: Players = cloneref(game:GetService("Players"))
 local RunService: RunService = cloneref(game:GetService("RunService"))
@@ -57,6 +58,12 @@ local function SafeParentUI(Instance: Instance, Parent: Instance | () -> Instanc
 end
 
 local function ParentUI(UI: Instance, SkipHiddenUI: boolean?)
+    local ConfiguredParent = getgenv().LinoriaGuiParent
+    if typeof(ConfiguredParent) == "Instance" then
+        SafeParentUI(UI, ConfiguredParent)
+        return
+    end
+
 	if SkipHiddenUI then
 		SafeParentUI(UI, CoreGui)
 		return
@@ -1117,6 +1124,11 @@ function Library:GiveSignal(Connection: RBXScriptConnection | RBXScriptSignal) -
 end
 
 function Library:Unload()
+    if Library.Unloaded then
+        return
+    end
+    Library.Unloaded = true
+
     for Idx = #Library.Signals, 1, -1 do
         local Connection = table.remove(Library.Signals, Idx)
         if Connection and Connection.Connected then
@@ -1135,7 +1147,9 @@ function Library:Unload()
     Library.Unloaded = true
     ScreenGui:Destroy()
 
-    getgenv().Linoria = nil
+    if getgenv().Linoria == Library then
+        getgenv().Linoria = nil
+    end
 end
 
 function Library:OnUnload(Callback)
@@ -7665,9 +7679,13 @@ do
         end
 
         for _, Side in next, { LeftSide, RightSide } do
-            Side:WaitForChild("UIListLayout"):GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-                Side.CanvasSize = UDim2.fromOffset(0, Side.UIListLayout.AbsoluteContentSize.Y)
-            end)
+            local Layout = Side:WaitForChild("UIListLayout")
+            Library:GiveSignal(Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                if Library.Unloaded or Side.Parent == nil or Layout.Parent ~= Side then
+                    return
+                end
+                Side.CanvasSize = UDim2.fromOffset(0, Layout.AbsoluteContentSize.Y)
+            end))
         end
 
         function Tab:Resize()
